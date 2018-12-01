@@ -9,6 +9,10 @@
 <body>
     <h1>{% block title %}
     {% endblock %}</h1>
+
+    {% for msg in get_flashed_messages() %}
+        <p>{{msg}}</p>
+    {% endfor%}
     {% block body %}
     {% endblock %}
 </body>
