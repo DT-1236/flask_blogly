@@ -28,7 +28,8 @@ def display_homepage():
 def display_all_users():
     """Displays all users in the Blogly database"""
 
-    users = User.query.all()
+    users = User.query.order_by(User.last_name.asc(),
+                                User.first_name.asc()).all()
     return render_template("homepage.html", users=users)
 
 
