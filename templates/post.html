@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block header %}
+
+{% endblock %}
+
+{% block title %}
+    {{post.title}}
+{% endblock %}
+
+{% block body%}
+    <p>{{post.content}}</p>
+    <p><i>By {{post.user.full_name}}</i></p>
+    <form action="/users/{{post.user_id}}"><button type='submit'>Cancel</button></form>
+    <form action="/posts/{{post.id}}/edit"><button type='submit'>Edit</button></form>
+    <form action="/posts/{{post.id}}" method='POST'><button type='submit'>Delete</button></form>
+{% endblock%}

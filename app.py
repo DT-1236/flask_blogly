@@ -1,7 +1,7 @@
 """Blogly application."""
 
 from flask import Flask, render_template, redirect, request, flash
-from models import db, connect_db, User
+from models import db, connect_db, User, Post
 from flask_debugtoolbar import DebugToolbarExtension
 
 app = Flask(__name__)
@@ -61,6 +61,7 @@ def display_a_user(user_id):
     """display a user according to its id"""
 
     user = User.query.get(user_id)
+    print(request.args)
     return render_template("user.html", user=user)
 
 
@@ -98,3 +99,50 @@ def delete_a_user(user_id):
     flash(f'you deeted me! {user.first_name} {user.last_name}')
 
     return redirect('/users')
+
+
+@app.route('/users/<int:user_id>/posts/new')
+def display_new_post_form(user_id: int):
+
+    return render_template('new_post.html', user=User.query.get(user_id))
+
+
+@app.route('/users/<int:user_id>/posts', methods=['POST'])
+def process_new_post_form(user_id: int):
+    form = request.form
+    new_post = Post(
+        title=form['title'], content=form['content'], user_id=user_id)
+    db.session.add(new_post)
+    db.session.commit()
+    return redirect(f'/users/{user_id}')
+
+
+@app.route('/posts/<int:post_id>')
+def display_post(post_id: int):
+    return render_template('post.html', post=Post.query.get(post_id))
+
+
+@app.route('/posts/<int:post_id>', methods=['POST'])
+def delete_post(post_id: int):
+    post = Post.get(post_id)
+    user_id = post.user.id
+    db.session.delete(post)
+    db.session.commit()
+    return redirect(f'/users/{user_id}')
+
+
+@app.route('/posts/<int:post_id>/edit')
+def display_edit_post_form(post_id: int):
+    return render_template('edit_post.html', post=Post.query.get(post_id))
+
+
+@app.route('/posts/<int:post_id>/edit', methods=['POST'])
+def process_edit_post_form(post_id: int):
+    form = request.form
+    post = Post.query.get(post_id)
+    post.title = form.get('title')
+    post.content = form.get('content')
+    db.session.add(post)
+    db.session.commit()
+    flash("post edited!")
+    return redirect(f"/posts/{post_id}")
