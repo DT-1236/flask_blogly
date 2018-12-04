@@ -5,17 +5,18 @@ Homepage
 {% endblock %}
 
 {% block title %}
-Users
+Blogly Recent Posts
 {% endblock %}
 
 {% block body%}
-<ul>
+<a href="/users">View all users</a>
+    {% for post in posts %}
+    <div>
+        <h2>{{ post.title }}</h2>
+        <p>{{ post.content}}</p>
+        <h5>{{ post.post_details}}</h5>
+    </div>
 
-    {% for user in users%}
-    <li><a href="/users/{{user.id}}">{{user.full_name}}</a></li>
     {% endfor %}
-</ul>
-<form action="/users/new">
-    <button type="submit">Add user</button>
-</form>
+
 {% endblock%}
