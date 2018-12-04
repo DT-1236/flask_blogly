@@ -119,11 +119,13 @@ def process_new_post_form(user_id: int):
         title=form['title'], content=form['content'], user_id=user_id)
     db.session.add(new_post)
     db.session.commit()
+
     return redirect(f'/users/{user_id}')
 
 
 @app.route('/posts/<int:post_id>')
 def display_post(post_id: int):
+
     return render_template('post.html', post=Post.query.get_or_404(post_id))
 
 
@@ -140,9 +142,10 @@ def delete_post(post_id: int):
 @app.route('/posts/<int:post_id>/edit')
 def display_edit_post_form(post_id: int):
     """  """
+    tags = Tag.query.all()
 
     return render_template(
-        'edit_post.html', post=Post.query.get_or_404(post_id))
+        'edit_post.html', post=Post.query.get_or_404(post_id), tags=tags)
 
 
 @app.route('/posts/<int:post_id>/edit', methods=['POST'])
@@ -151,9 +154,11 @@ def process_edit_post_form(post_id: int):
     post = Post.query.get_or_404(post_id)
     post.title = form.get('title')
     post.content = form.get('content')
+    post.tags = form.getlist('tags')
     db.session.add(post)
     db.session.commit()
     flash("post edited!")
+
     return redirect(f"/posts/{post_id}")
 
 
@@ -176,10 +181,8 @@ def list_tag():
 def process_new_tag():
     """ ###"""
     new_tag = request.form.get('tag_name')
-    import pdb
-    pdb.set_trace()
 
-    db.session.add(Tag(new_tag))
+    db.session.add(Tag(name=new_tag))
     db.session.commit()
 
     return redirect('/tags')
@@ -190,3 +193,43 @@ def add_a_tag():
     """ display the adding a new tag form"""
 
     return render_template('new_tag.html')
+
+
+@app.route('/tags/<int:id>')
+def display_a_tag(id: int):
+    """ """
+
+    tag = Tag.query.get(id)
+    return render_template('tag.html', tag=tag)
+
+
+@app.route('/tags/<int:id>/edit')
+def display_edit_a_tag_form(id: int):
+    """ """
+
+    tag = Tag.query.get(id)
+    return render_template('edit_tag.html', tag=tag)
+
+
+@app.route('/tags/<int:id>/edit', methods=['POST'])
+def process_a_tag_form(id: int):
+    """ """
+    new_tag_name = request.form.get('tag_name')
+    updated_tag_name = Tag.query.get(id)
+    updated_tag_name.name = new_tag_name
+
+    db.session.add(updated_tag_name)
+    db.session.commit()
+    flash(f'You just edit Tag {id} to {new_tag_name}!')
+    return redirect(f'/tags/{id}')
+
+
+@app.route('/tags/<int:id>/delete', methods=['POST'])
+def delete_a_tag(id):
+
+    tag = Tag.query.get_or_404(id)
+    db.session.delete(tag)
+    db.session.commit()
+    flash(f'you deeted me! {tag.name}')
+
+    return redirect('/tags')
