@@ -107,9 +107,9 @@ def delete_a_user(user_id):
 
 @app.route('/users/<int:user_id>/posts/new')
 def display_new_post_form(user_id: int):
-
+    tags = Tag.query.all()
     return render_template(
-        'new_post.html', user=User.query.get_or_404(user_id))
+        'new_post.html', user=User.query.get_or_404(user_id), tags=tags)
 
 
 @app.route('/users/<int:user_id>/posts', methods=['POST'])
@@ -117,6 +117,9 @@ def process_new_post_form(user_id: int):
     form = request.form
     new_post = Post(
         title=form['title'], content=form['content'], user_id=user_id)
+    relevant_tags = db.session.query(Tag).filter(
+        Tag.id.in_(form.getlist('tags'))).all()
+    new_post.tags = relevant_tags
     db.session.add(new_post)
     db.session.commit()
 
@@ -144,6 +147,8 @@ def display_edit_post_form(post_id: int):
     """  """
     tags = Tag.query.all()
 
+    # Try to make it so that the checkboxes for relevant tags are checked
+
     return render_template(
         'edit_post.html', post=Post.query.get_or_404(post_id), tags=tags)
 
@@ -151,10 +156,19 @@ def display_edit_post_form(post_id: int):
 @app.route('/posts/<int:post_id>/edit', methods=['POST'])
 def process_edit_post_form(post_id: int):
     form = request.form
+
     post = Post.query.get_or_404(post_id)
     post.title = form.get('title')
     post.content = form.get('content')
-    post.tags = form.getlist('tags')
+
+    # tags = form.getlist('tags')
+    # for tag in tags:
+    #         db.session.add(PostTag(post_id=post_id, tag_id=int(tag)))
+    # db.session.commit()
+
+    relevant_tags = db.session.query(Tag).filter(
+        Tag.id.in_(form.getlist('tags'))).all()
+    post.tags = relevant_tags
     db.session.add(post)
     db.session.commit()
     flash("post edited!")
@@ -212,13 +226,16 @@ def display_edit_a_tag_form(id: int):
 
 
 @app.route('/tags/<int:id>/edit', methods=['POST'])
-def process_a_tag_form(id: int):
+def process_edit_tag_form(id: int):
     """ """
     new_tag_name = request.form.get('tag_name')
-    updated_tag_name = Tag.query.get(id)
-    updated_tag_name.name = new_tag_name
+    tag = Tag.query.get(id)
+    tag.name = new_tag_name
+    related_posts = db.session.query(Post).filter(
+        Post.id.in_(request.form.getlist('posts'))).all()
+    Tag.query.get(id).posts = related_posts
 
-    db.session.add(updated_tag_name)
+    db.session.add(tag)
     db.session.commit()
     flash(f'You just edit Tag {id} to {new_tag_name}!')
     return redirect(f'/tags/{id}')

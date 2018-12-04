@@ -12,7 +12,13 @@ Make a poast for {{user.full_name}}!
 <form action="/users/{{user.id}}/posts" method="POST">
    <label for="title">Title</label> <input required name='title' placeholder="Cool title" type="text">
    <label for="content">Content</label> <input name='content' placeholder="Cool story" type="text">
-   <a href="/users/{{user.id}}">Cancel</a>
+   {% for tag in tags %}
+
+   <input type="checkbox" name="tags" value="{{ tag.id }}"> {{ tag.name }} <br>
+
+   {% endfor %}
+
    <button type="submit">Add</button>
+   <a href="/users/{{user.id}}">Cancel</a>
 </form>
 {% endblock%}

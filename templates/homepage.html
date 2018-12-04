@@ -10,11 +10,18 @@ Blogly Recent Posts
 
 {% block body%}
 <a href="/users">View all users</a>
+<br>
+<a href="/tags">View all tags</a>
+
     {% for post in posts %}
     <div>
-        <h2>{{ post.title }}</h2>
+        <h2><a href="/posts/{{post.id}}">{{ post.title }}</a></h2>
         <p>{{ post.content}}</p>
-        <h5>{{ post.post_details}}</h5>
+        <h5> {% for tag in post.tags %}
+
+        <a href="/tags/{{tag.id}}">{{tag.name}}</a>
+                {% endfor %}      
+        <br>{{ post.post_details}}</h5>
     </div>
 
     {% endfor %}

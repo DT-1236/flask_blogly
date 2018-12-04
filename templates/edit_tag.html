@@ -12,8 +12,13 @@ Edit {{ tag.name }}
 
 <form action="/tags/{{tag.id}}/edit" method="POST">
    <label for="tag_name">Name</label> <input required name='tag_name' value={{ tag.name }} type="text">
-   <a href="/tags/{{tag.id}}">Cancel</a>
+   {% for post in tag.posts %}
+
+   <input checked type="checkbox" name="posts" value="{{ post.id }}"> {{ post.title }} <br>
+
+   {% endfor %}
    <button type="submit">Edit</button>
 </form>
+<a href="/tags/{{tag.id}}">Cancel</a>
 
 {% endblock%}

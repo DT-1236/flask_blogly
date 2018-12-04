@@ -14,14 +14,13 @@
     <form action="/users/{{post.user_id}}"><button type='submit'>Cancel</button></form>
     <form action="/posts/{{post.id}}" method='POST'><button type='submit'>Delete</button></form>
     <form action="/posts/{{post.id}}/edit">
+        <button type='submit'>Edit</button></form>
         
-        {% for tag in tags %}
+        {% for tag in post.tags %}
 
-        <input type="checkbox" name="tags" value="{{ tag.name }}"> {{ tag.name }} <br>
-
+<a href="/tags/{{tag.id}}">{{tag.name}}</a>
         {% endfor %}
         
-    <button type='submit'>Edit</button></form>
 
 
 
